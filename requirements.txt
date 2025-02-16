@@ -1,0 +1,11 @@
+fastapi
+pydantic
+docx2txt
+PyPDF2
+pandas
+tiktoken
+uvicorn
+openai
+python-multipart
+openpyxl
+google-generativeai
