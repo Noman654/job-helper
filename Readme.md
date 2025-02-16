@@ -84,7 +84,4 @@ You can access the API documentation at `http://localhost:8000/docs`.
 - **GET** `/health`
 - Verifies the API is running and returns configuration information.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
