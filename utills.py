@@ -14,14 +14,14 @@ import google.generativeai as genai
 import time
 
 from models import LLMMode, Settings
+import os
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize Gemini client
-# GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_API_KEY = "AIzaSyDD9_mQ2i_J9EG4Zgyl0IYZMmweO-RjubA"
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 
 if not GEMINI_API_KEY:
@@ -216,6 +216,34 @@ def extract_criteria_rule_based(text):
     
     return criteria
 
+
+async def generate_column_name_with_llm(criterion: str) -> str:
+    """Generate a column name from a criterion using LLM for better results."""
+
+    model = DEFAULT_MODEL
+    if not model:
+        # Fallback to simple rule-based approach if LLM is not available
+        words = criterion.split()
+        return ' '.join(words[:6]).title()
+    
+    prompt = f"""
+    Generate a concise and descriptive column name for the following job criterion. The column name should be 3-6 words long and clearly represent the criterion.
+    
+    Job Criterion:
+    {criterion}
+    
+    Column Name (Should be 2-6 words) Only string No formatting:
+    """
+    
+    response = await call_llm_api(prompt, model, max_tokens=20)
+    
+    if response:
+        return response.strip().title()
+    else:
+        # Fallback to simple rule-based approach if LLM fails
+        words = criterion.split()
+        return ' '.join(words[:6]).title()
+
 async def score_resume_with_llm(resume_text: str, criteria: List[str], settings: Settings):
     """Score a resume against criteria using LLM."""
     model = get_llm_model(settings)
@@ -266,11 +294,13 @@ async def score_resume_with_llm(resume_text: str, criteria: List[str], settings:
             key = str(i + 1)
             if key in scores_dict:
                 # Use first 3 words of criterion as the column name
-                column_name = ' '.join(criterion.split()[:3]).title()
+                # column_name = await generate_column_name_with_llm(criterion)
+                column_name = criterion
+
                 result[column_name] = int(scores_dict[key])
             else:
                 # Fallback if criterion is missing in response
-                column_name = ' '.join(criterion.split()[:3]).title()
+                column_name = criterion
                 result[column_name] = 0
         
         return result

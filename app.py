@@ -18,7 +18,8 @@ from utills import (
     score_resume_keyword_match,
     score_resume_with_llm,
     extract_criteria_rule_based,
-    extract_criteria_with_llm
+    extract_criteria_with_llm,
+    generate_column_name_with_llm, GEMINI_API_KEY
 )
 
 import time
@@ -170,7 +171,9 @@ async def score_resumes(
                 })
         
         # Sort results by total score (descending)
+        # columns_names = ["Candidate Name"] + criteria + ["Total Score"] 
         results.sort(key=lambda x: x.get("Total Score", 0), reverse=True)
+
         
         # Create Excel file
         df = pd.DataFrame(results)
@@ -180,7 +183,17 @@ async def score_resumes(
         if "Error" in df.columns:
             columns.append("Error")
         columns.append("Total Score")
+
         df = df[columns]
+        
+        columns = ["Candidate Name"]
+        for c in df.columns :
+            if c not in ["Candidate Name", "Total Score", "Error"]:
+                c = await generate_column_name_with_llm(c)
+                columns.append(c)
+        columns.append("Total Score")
+        
+        df.columns = columns
         
 
         dir = './temp'
@@ -227,9 +240,8 @@ async def health_check():
         "status": "healthy",
         "version": app.version,
         "llm_available": has_gemini_key,
-        "llm_model": DEFAULT_MODEL,
-        "premium_model": PREMIUM_MODEL,
-        "jobs_in_progress": len(job_scores_store),
+        "llm_model": LLMMode.BASIC,
+        "premium_model": LLMMode.PREMIUM,
         "timestamp": time.time()
     }
 

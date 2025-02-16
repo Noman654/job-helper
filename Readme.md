@@ -1,6 +1,3 @@
-### README.md
-
-```markdown
 # Advanced Resume Ranking System with Gemini Integration
 
 This project is an API for extracting criteria from job descriptions and scoring resumes using Gemini integration. It leverages FastAPI for building the web service and provides endpoints for extracting criteria and scoring resumes.
@@ -90,34 +87,4 @@ You can access the API documentation at `http://localhost:8000/docs`.
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-```
 
-### Dockerfile
-
-```dockerfile
-# Use the official Python image from the Docker Hub
-FROM python:3.9-slim
-
-# Set the working directory
-WORKDIR /app
-
-# Copy the requirements file
-COPY requirements.txt .
-
-# Install the required packages
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the application code
-COPY . .
-
-# Expose the port the app runs on
-EXPOSE 8000
-
-# Command to run the application
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-### Notes:
-- Make sure to create a `requirements.txt` file that lists all the necessary dependencies for your FastAPI application.
-- Replace `yourusername` in the README with your actual GitHub username or organization name.
-- Adjust the Python version in the Dockerfile if necessary, based on your application's requirements.
